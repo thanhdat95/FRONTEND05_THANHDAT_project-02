@@ -1,0 +1,21 @@
+img {
+    max-width: 100%;
+    display: block;
+}
+
+#nav-tabContent .whats-right-img {
+    width: 50%;
+}
+#nav-tabContent .whats-right-cap {
+    flex: 1;
+}
+#related-post .post_item img {
+    width: 15%;
+
+}
+
+.main-header .main-menu ul li .active{
+    color: blue;
+}
+
+
