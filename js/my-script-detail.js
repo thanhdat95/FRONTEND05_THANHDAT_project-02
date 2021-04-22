@@ -6,7 +6,7 @@ $(document).ready(function () {
    let c = url.searchParams.get("id");
    
    //Lấy nội dung chi tiết của bài viết
-   $.get(`${baseURL}articles/2`, function (data) {
+   $.get(`${baseURL}articles/${c}`, function (data) {
       let contentNews = '';
          contentNews += `
          <div class="feature-img">
@@ -25,17 +25,19 @@ $(document).ready(function () {
          </div>
          `;
       $('#detail-news').html(contentNews); 
-   });
+      let category = data.category_id;
+      console.log(category);
 
+   
    //Lấy các bài viết cùng chuyên mục
-   $.get(`${baseURL}categories_news/2/articles`, function (data) {
+   $.get(`${baseURL}categories_news/${category}/articles`, function (data) {
       let contentRelatedPost = '';
       data.forEach(element => {
          contentRelatedPost += `
             <div class="media post_item">
                <img src="${element.thumb}" alt="post">
                <div class="media-body">
-                  <a href="single-blog.html">
+                  <a href="detail.html?id=${element.id}">
                      <h3>${element.title}</h3>
                   </a>
                   <p>${element.publish_date}</p>
@@ -44,5 +46,8 @@ $(document).ready(function () {
       });
       $('#related-post').html(contentRelatedPost);
    });   
+   });
+  
+   
 });
 
