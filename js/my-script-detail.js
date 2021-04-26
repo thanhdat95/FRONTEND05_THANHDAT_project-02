@@ -3,7 +3,7 @@ $(document).ready(function () {
 
     let url_string = window.location.href; //window.location.href
     let url = new URL(url_string);
-    let c = url.searchParams.get('id');
+    let c = url.searchParams.get("id");
 
     $.get(`${baseURL}categories_news`, function (data) {
         let content = '<li class="menu-active"><a href="index.html">Trang Chủ</a></li>';
@@ -34,6 +34,7 @@ $(document).ready(function () {
     //Lấy nội dung chi tiết của bài viết
     $.get(`${baseURL}articles/${c}`, function (data) {
         let contentNews = '';
+        console.log(data);
         contentNews += `
           <div class="feature-img">
               <img class="img-fluid" src="${data.thumb}" alt="">
@@ -51,11 +52,11 @@ $(document).ready(function () {
           </div>
           `;
         $('#detail-news').html(contentNews);
-        let category = data.category_id;
 
         //Lấy các bài viết cùng chuyên mục
+        let category = data.category_id;
         $.get(`${baseURL}categories_news/${category}/articles`, function (data) {
-            let contentRelatedPost = '';
+            let contentRelatedPost = '<h3 class="widget_title">Bài viết liên quan</h3>';
             data.forEach((element) => {
                 contentRelatedPost += `
                 <div class="media post_item">

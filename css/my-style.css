@@ -14,8 +14,7 @@ img {
 
 }
 
-.main-header .main-menu ul li .active{
-    color: blue;
+.main-header .main-menu ul li.active-menu a{
+    color: black;
 }
-
 

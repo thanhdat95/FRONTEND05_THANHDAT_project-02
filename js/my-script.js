@@ -1,101 +1,41 @@
 $(document).ready(function () {
     let baseURL = 'https://api-fe-course.codethanhthuongthua.asia/api/';
-    // FUNCTION
-    function mainSlider() {
-        var BasicSlider = $('.slider-active');
-        BasicSlider.on('init', function (e, slick) {
-            var $firstAnimatingElements = $('.single-slider:first-child').find('[data-animation]');
-            doAnimations($firstAnimatingElements);
-        });
-        BasicSlider.on('beforeChange', function (e, slick, currentSlide, nextSlide) {
-            var $animatingElements = $('.single-slider[data-slick-index="' + nextSlide + '"]').find(
-                '[data-animation]'
-            );
-            doAnimations($animatingElements);
-        });
-        BasicSlider.slick({
-            autoplay: true,
-            autoplaySpeed: 3500,
-            dots: false,
-            fade: true,
-            arrows: false,
-            prevArrow:
-                '<button type="button" class="slick-prev"><i class="ti-angle-left"></i></button>',
-            nextArrow:
-                '<button type="button" class="slick-next"><i class="ti-angle-right"></i></button>',
-            responsive: [
-                {
-                    breakpoint: 1024,
-                    settings: {
-                        slidesToShow: 1,
-                        slidesToScroll: 1,
-                        infinite: true,
-                    },
-                },
-                {
-                    breakpoint: 991,
-                    settings: {
-                        slidesToShow: 1,
-                        slidesToScroll: 1,
-                        arrows: false,
-                    },
-                },
-                {
-                    breakpoint: 767,
-                    settings: {
-                        slidesToShow: 1,
-                        slidesToScroll: 1,
-                        arrows: false,
-                    },
-                },
-            ],
-        });
-
-        function doAnimations(elements) {
-            var animationEndEvents =
-                'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
-            elements.each(function () {
-                var $this = $(this);
-                var $animationDelay = $this.data('delay');
-                var $animationType = 'animated ' + $this.data('animation');
-                $this.css({
-                    'animation-delay': $animationDelay,
-                    '-webkit-animation-delay': $animationDelay,
-                });
-                $this.addClass($animationType).one(animationEndEvents, function () {
-                    $this.removeClass($animationType);
-                });
-            });
-        }
-    }
+    $(document).on('click', 'ul li', function() {
+        $(this).addClass('active-menu').sibling().removeClass('active-menu')
+    })
     // MENU 
     $.get(`${baseURL}categories_news`, function (data) {
         
-        let content = '<li class="menu-active"><a href="detail.html?id=${item.id}">Trang Chủ</a></li>';
+        let content = '<li class="active-menu"><a href="index.html?id=${item.id}">Trang Chủ</a></li>';
         if(data.length < 5){
-            data.forEach(item => {
-                content += `<li><a href="detail.html?id=${item.id}">${item.name}</a></li>`;
+            data.forEach(item, index => {
+                content += `<li ${index == 0 ? 'active-menu' : ''}><a href="category.html?id=${item.id}">${item.name}</a></li>`;
             });
         } else {
-            for (let index = 0; index <=3 ; index++) {
-                content += `<li><a href="detail.html?id=${data.id}">${data[index].name}</a></li>`;
+            for (let index = 0; index <=2 ; index++) {
+                content += `<li><a href="category.html?id=${data.id}">${data[index].name}</a></li>`;
             }
         
             content += `
-            <li><a href="detail.html?id=${data.id}">Mục khác</a>
+            <li><a href="category.html?id=${data.id}">Mục khác</a>
                 <ul class="submenu">
-                    <li><a href="detail.html?id=${data.id}"></a></li>
+                    <li><a href="category.html?id=${data.id}"></a></li>
             `;
 
-            for (let index = 5; index < data.length; index++) {
-                content += `<li><a href="detail.html?id=${data.id}">${data[index].name}</a></li>`
+            for (let index = 3; index < data.length; index++) {
+                content += `<li><a href="category.html?id=${data.id}">${data[index].name}</a></li>`
             }
 
             content += `</li></ul>`;
         }
 
         $('#navigation').html(content);
+        // $('#navigation li a').click(function(){
+        //     $('li a').removeClass("menu-active");
+        //     $(this).addClass("menu-active");
+        // });
     });
+    
     //trending left
     $.get(`${baseURL}categories_news/1/articles?limit=3`, function (data) {
         let content = '';
@@ -269,85 +209,166 @@ $(document).ready(function () {
         });
     });
     //What News
-    // $.get(`${baseURL}categories_news/2/articles`, function (dataCategories) {
+    $.get(`${baseURL}categories_news/2/articles`, function (dataCategories) {
+        let contentCategories = '';
+        dataCategories.forEach((categoryItem, index) => {
+            contentCategories += `   
+                    <a class="nav-item nav-link ${index == 0 ? 'active' : ''}" id="nav-${categoryItem.slug}-tab" data-toggle="tab"
+                        href="#nav-${categoryItem.slug}" role="tab" aria-controls="nav-${categoryItem.slug}"
+                        aria-selected="${index == 0 ? 'true' : 'false'}">${categoryItem.name}</a>    `;
+
+            $.get(`${baseURL}/${categoryItem.id}/articles?limit=4`, function (dataArticles) {
+                let contentArticles = '';
+                dataArticles.forEach((articleItem) => {
+                    contentArticles += `
+                        <div class="col-lg-6 col-md-6 col-sm-10">
+                            <div class="whats-right-single mb-20">
+                                <div class="whats-right-img">
+                                    <img src="${articleItem.thumb}" alt="">
+                                </div>
+                                <div class="whats-right-cap">
+                                    <span class="colorb">FASHION</span>
+                                    <h4><a href="latest_news.html">${articleItem.title}</a></h4>
+                                    <p>${articleItem.publish_date}</p>
+                                </div>
+                            </div>
+                        </div>
+                        `;
+                })
+                contentArticles = `
+                <div class="tab-pane fade show ${index == 0 ? 'active' : ''}" id="nav-${categoryItem.slug}" role="tabpanel" aria-labelledby="nav-${categoryItem.slug}-tab">
+                    <div class="row">
+                        ${contentArticles}
+                    </div>
+                </div>
+                `
+                $('#whats-new-content').append(contentArticles);
+
+            })
+        });
+        $('#whats-new').html(contentCategories);
+
+    })
+
+    // $.get(`${baseURL}categories_news/3/articles`, function (dataCategories) {
     //     let contentCategories = '';
     //     dataCategories.forEach((categoryItem, index) => {
-    //         contentCategories += `   
-    //                 <a class="nav-item nav-link ${index == 0 ? 'active' : ''}" id="nav-${categoryItem.slug}-tab" data-toggle="tab"
-    //                     href="#nav-${categoryItem.slug}" role="tab" aria-controls="nav-${categoryItem.slug}"
-    //                     aria-selected="${index == 0 ? 'true' : 'false'}">${categoryItem.name}</a>    `;
+    //     contentCategories += `   
+    //             <a class="nav-item nav-link ${index == 0 ? 'active' : ''}" id="nav-${categoryItem.slug}-tab" data-toggle="tab"
+    //                 href="#nav-${categoryItem.slug}" role="tab" aria-controls="nav-${categoryItem.slug}"
+    //                 aria-selected="${index == 0 ? 'true' : 'false'}">${categoryItem.name}</a>    `;
 
-    //         $.get(`${baseURL}/${categoryItem.id}/articles?limit=4`, function (dataArticles) {
-    //             let contentArticles = '';
-    //             dataArticles.forEach((articleItem) => {
-    //                 contentArticles += `
-    //                     <div class="col-lg-6 col-md-6 col-sm-10">
-    //                         <div class="whats-right-single mb-20">
-    //                             <div class="whats-right-img">
-    //                                 <img src="${articleItem.thumb}" alt="">
-    //                             </div>
-    //                             <div class="whats-right-cap">
-    //                                 <span class="colorb">FASHION</span>
-    //                                 <h4><a href="latest_news.html">${articleItem.title}</a></h4>
-    //                                 <p>${articleItem.publish_date}</p>
-    //                             </div>
+    //     $.get(`${baseURL}categories_news/${categoryItem.id}/articles?limit=5`, function(data) {
+    //         let singlePostContentLeft = '';
+    //         let singlePostContentRight = '';
+            
+    //         data.forEach((item, index) => {
+                
+    //             if (index == 0) {
+    //                 singlePostContentLeft = `
+    //                     <div class="whats-news-single mb-40 mb-40">
+    //                         <div class="whates-img">
+    //                             <img src="${item.thumb}" alt="">
+    //                         </div>
+    //                         <div class="whates-caption">
+    //                             <h4><a href="detail.html?id=${item.id}">${item.title}</a></h4>
+    //                             <span>${item.publish_date}</span>
+    //                             <p>${item.description}</p>
     //                         </div>
     //                     </div>
-    //                     `;
-    //             })
-    //             contentArticles = `
-    //             <div class="tab-pane fade show ${index == 0 ? 'active' : ''}" id="nav-${categoryItem.slug}" role="tabpanel" aria-labelledby="nav-${categoryItem.slug}-tab">
-    //                 <div class="row">
-    //                     ${contentArticles}
-    //                 </div>
-    //             </div>
-    //             `
-    //             $('#whats-new-content').append(contentArticles);
-
-    //         })
+    //             `;
+    //             } else {
+    //                 singlePostContentRight += `
+    //                     <div class="whats-right-single mb-20">
+    //                         <div class="whats-right-img">
+    //                             <img src="${item.thumb}" alt="">
+    //                         </div>
+    //                         <div class="whats-right-cap">
+    //                             <span class="colorb">FASHION</span>
+    //                             <h4><a href="detail.html?id=${item.id}">${item.title}</a></h4>
+    //                             <p>${item.publish_date}</p> 
+    //                         </div>
+    //                     </div>
+    //             `;
+    //             }
+    //         });
+           
+    //         $('#left-content').append(singlePostContentLeft);
+    //         $('#right-content').append(singlePostContentRight);
     //     });
-    //     $('#whats-new').html(contentCategories);
+    // });               
+    // });
 
-    // })
 
-  
-    $.get(`${baseURL}categories_news/3/articles?limit=5`, function(data) {
-            let singlePostContentLeft = '';
-            let singlePostContentRight = '';
 
-            data.forEach((item, index) => {
-                
-                if (index == 0) {
-                    singlePostContentLeft = `
-                        <div class="whats-news-single mb-40 mb-40">
-                            <div class="whates-img">
-                                <img src="${item.thumb}" alt="">
-                            </div>
-                            <div class="whates-caption">
-                                <h4><a href="detail.html?id=${item.id}">${item.title}</a></h4>
-                                <span>${item.publish_date}</span>
-                                <p>${item.description}</p>
-                            </div>
-                        </div>
-                `;
-                } else {
-                    singlePostContentRight += `
-                        <div class="whats-right-single mb-20">
-                            <div class="whats-right-img">
-                                <img src="${item.thumb}" alt="">
-                            </div>
-                            <div class="whats-right-cap">
-                                <span class="colorb">FASHION</span>
-                                <h4><a href="detail.html?id=${item.id}">${item.title}</a></h4>
-                                <p>${item.publish_date}</p> 
-                            </div>
-                        </div>
-                `;
-                }
+    // FUNCTION
+    function mainSlider() {
+        var BasicSlider = $('.slider-active');
+        BasicSlider.on('init', function (e, slick) {
+            var $firstAnimatingElements = $('.single-slider:first-child').find('[data-animation]');
+            doAnimations($firstAnimatingElements);
+        });
+        BasicSlider.on('beforeChange', function (e, slick, currentSlide, nextSlide) {
+            var $animatingElements = $('.single-slider[data-slick-index="' + nextSlide + '"]').find(
+                '[data-animation]'
+            );
+            doAnimations($animatingElements);
+        });
+        BasicSlider.slick({
+            autoplay: true,
+            autoplaySpeed: 3500,
+            dots: false,
+            fade: true,
+            arrows: false,
+            prevArrow:
+                '<button type="button" class="slick-prev"><i class="ti-angle-left"></i></button>',
+            nextArrow:
+                '<button type="button" class="slick-next"><i class="ti-angle-right"></i></button>',
+            responsive: [
+                {
+                    breakpoint: 1024,
+                    settings: {
+                        slidesToShow: 1,
+                        slidesToScroll: 1,
+                        infinite: true,
+                    },
+                },
+                {
+                    breakpoint: 991,
+                    settings: {
+                        slidesToShow: 1,
+                        slidesToScroll: 1,
+                        arrows: false,
+                    },
+                },
+                {
+                    breakpoint: 767,
+                    settings: {
+                        slidesToShow: 1,
+                        slidesToScroll: 1,
+                        arrows: false,
+                    },
+                },
+            ],
+        });
+
+        function doAnimations(elements) {
+            var animationEndEvents =
+                'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
+            elements.each(function () {
+                var $this = $(this);
+                var $animationDelay = $this.data('delay');
+                var $animationType = 'animated ' + $this.data('animation');
+                $this.css({
+                    'animation-delay': $animationDelay,
+                    '-webkit-animation-delay': $animationDelay,
+                });
+                $this.addClass($animationType).one(animationEndEvents, function () {
+                    $this.removeClass($animationType);
+                });
             });
-            $('#left-content').html(singlePostContentLeft);
-            $('#right-content').html(singlePostContentRight);
-        })
-    
+        }
+    }
 
+   
 });
