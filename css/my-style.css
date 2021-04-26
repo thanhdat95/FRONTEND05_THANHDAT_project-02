@@ -11,10 +11,8 @@ img {
 }
 #related-post .post_item img {
     width: 15%;
-
 }
 
-.main-header .main-menu ul li.active-menu a{
+.main-header .main-menu ul li.menu-active a {
     color: black;
 }
-

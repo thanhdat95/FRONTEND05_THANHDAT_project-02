@@ -5,6 +5,10 @@ $(document).ready(function () {
     let url = new URL(url_string);
     let c = url.searchParams.get("id");
 
+    if (!c) {
+        window.location.href = 'index.html';
+    }
+
     $.get(`${baseURL}categories_news`, function (data) {
         let content = '<li class="menu-active"><a href="index.html">Trang Chủ</a></li>';
         if (data.length < 5) {
